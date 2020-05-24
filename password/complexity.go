@@ -4,10 +4,12 @@ package password
 // It accepts the same rules than Generate, but it allows to set:
 // minLenght ensures password is not smaller.
 // maxLenght ensures password is not longer that maximum lenght.
+// minLower ensures password have lowercase characters.
+// minUpper ensures password have uppercase characters.
 // exact ensures password has the required amount of characters,
-// if false it will check if the password has the type if num is
-// greater than 0
-func (g *Generator) Meet(source string, minLenght, maxLenght, numDigits, numSymbols int, noUpper, allowRepeat, exact bool) bool {
+// if true numType need to match
+// if false it will check the type is used, but not the amount
+func (g *Generator) Meet(source string, minLenght, maxLenght, numLower, numUpper, numDigits, numSymbols int, allowRepeat, exact bool) bool {
 
 	var (
 		sourceBytes []byte
@@ -70,10 +72,15 @@ func (g *Generator) Meet(source string, minLenght, maxLenght, numDigits, numSymb
 		if numSymbols > 0 && symbols == 0 {
 			return false
 		}
+
+	}
+	// it must have at least 1 lowercase character
+	if numLower > 0 && numLower > lower {
+		return false
 	}
 
-	// upper not requested but there are
-	if noUpper && upper > 0 {
+	// it must have at least 1 uppercase character
+	if numUpper > 0 && numUpper > upper {
 		return false
 	}
 
