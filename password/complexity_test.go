@@ -26,11 +26,10 @@ func TestComplexity(t *testing.T) {
 	for _, d := range []int{0, 4} {
 		for _, s := range []int{0, 4} {
 			for _, l := range []int{0, 4} {
-
 				for _, u := range []int{0, 4} {
 					for _, r := range []bool{true, false} {
 						cases = append(cases, c{
-							Length:  20,
+							Length:  40,
 							Digits:  d,
 							Symbols: s,
 							Lower:   l,
@@ -44,84 +43,62 @@ func TestComplexity(t *testing.T) {
 	}
 
 	for _, this := range cases {
-		for i := 0; i < 4; i++ {
+		for i := 0; i < 100; i++ {
 			var (
 				res string
 				err error
 			)
 
-			res, err = gen.Generate(this.Length, this.Digits, this.Symbols, true, this.Repeat)
-
+			res, err = gen.Generate(this.Length, this.Digits, this.Symbols, false, this.Repeat)
 			if err != nil {
 				t.Error(err)
 			}
 
-			for _, exact := range []bool{true, false} {
-				if expected := gen.Meet(res, this.Length-2, this.Length+2, this.Lower, 0, this.Digits, this.Symbols, this.Repeat, exact); !expected {
-					fmt.Println(expected)
-					t.Errorf("expected %t to be %t", expected, true)
-				}
+			if expected := gen.Meet(res, this.Length-2, this.Length+2, this.Lower != 0, this.Upper != 0, this.Digits != 0, this.Symbols != 0, this.Repeat); !expected {
+				fmt.Println(expected)
+				t.Errorf("expected %t to be %t", expected, true)
 			}
 		}
 	}
 
 	// fail because of min length
-	if expected := gen.Meet("aaa", 8, 8, 0, 0, 0, 0, false, false); expected {
+	if expected := gen.Meet("aaa", 8, 8, false, false, false, false, false); expected {
 		t.Errorf("expected %t to be %t", expected, false)
 	}
 
 	// fail because of max length
-	if expected := gen.Meet("123456789012", 8, 8, 0, 0, 0, 0, false, false); expected {
+	if expected := gen.Meet("123456789012", 8, 8, false, false, false, false, false); expected {
 		t.Errorf("expected %t to be %t", expected, false)
 	}
 
-	// fail because of numDigits
-	if expected := gen.Meet("abcd", 2, 8, 0, 0, 1, 0, false, false); expected {
+	// fail because of digits
+	if expected := gen.Meet("abcd", 2, 8, false, false, true, false, false); expected {
 		t.Errorf("expected %t to be %t", expected, false)
 	}
 
-	// fail because of numDigits & exact
-	if expected := gen.Meet("abcd123", 2, 8, 0, 0, 1, 0, false, true); expected {
+	// fail because of symbols
+	if expected := gen.Meet("abcd", 2, 8, false, false, false, true, false); expected {
 		t.Errorf("expected %t to be %t", expected, false)
 	}
 
-	// fail because of numSymbols
-	if expected := gen.Meet("abcd", 2, 8, 0, 0, 0, 1, false, false); expected {
-		t.Errorf("expected %t to be %t", expected, false)
-	}
-
-	// fail because of numSymbols & exact
-	if expected := gen.Meet("abcd$%&", 2, 8, 0, 0, 0, 1, false, true); expected {
-		t.Errorf("expected %t to be %t", expected, false)
-	}
-
-	// fail because of numLower
-	if expected := gen.Meet("ABCD", 2, 8, 1, 0, 0, 0, false, false); expected {
-		t.Errorf("expected %t to be %t", expected, false)
-	}
-
-	// fail because of numLower & exact
-	if expected := gen.Meet("ABCD$%&", 2, 8, 1, 0, 0, 0, false, true); expected {
+	// fail because of lower
+	if expected := gen.Meet("ABCD", 2, 8, true, false, false, false, false); expected {
 		t.Errorf("expected %t to be %t", expected, false)
 	}
 
 	// fail because of numUpper
-	if expected := gen.Meet("abcd", 2, 8, 0, 1, 0, 0, false, false); expected {
+	if expected := gen.Meet("abcd", 2, 8, false, true, false, false, false); expected {
 		t.Errorf("expected %t to be %t", expected, false)
 	}
 
-	// // fail because of numUpper & exact
-	// if expected := gen.Meet("abcd$%&", 2, 8, 0, 1, 0, 0, false, true); expected {
-	// 	t.Errorf("expected %t to be %t", expected, false)
-	// }
-	// // true because of numUpper & exact
-	// if expected := gen.Meet("abcd$%&A", 2, 8, 0, 1, 0, 0, false, true); expected {
-	// 	t.Errorf("expected %t to be %t", expected, true)
-	// }
+	// fail because of repetitions (no allowed)
+	if expected := gen.Meet("a1$a1$", 2, 8, false, false, false, false, false); expected {
+		t.Errorf("expected %t to be %t", expected, false)
+	}
 
-	// // fail because of repetitions
-	// if expected := gen.Meet("a1$a1$", 2, 8, 0, 0, 0, 0, false, false); expected {
-	// 	t.Errorf("expected %t to be %t", expected, false)
-	// }
+	// fail because of repetitions (allowed)
+	if expected := gen.Meet("a1$a1$", 2, 8, false, false, false, false, true); !expected {
+		t.Errorf("expected %t to be %t", expected, true)
+	}
 
 }

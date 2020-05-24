@@ -26,7 +26,7 @@ var _ PasswordGenerator = (*Generator)(nil)
 type PasswordGenerator interface {
 	Generate(int, int, int, bool, bool) (string, error)
 	MustGenerate(int, int, int, bool, bool) string
-	Meet(string, int, int, int, int, int, int, bool, bool) bool
+	Meet(string, int, int, bool, bool, bool, bool, bool) bool
 }
 
 const (

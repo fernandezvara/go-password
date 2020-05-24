@@ -38,6 +38,6 @@ func (g *mockGenerator) MustGenerate(int, int, int, bool, bool) string {
 	return g.result
 }
 
-func (g *mockGenerator) Meet(string, int, int, int, int, int, int, bool, bool) bool {
+func (g *mockGenerator) Meet(string, int, int, bool, bool, bool, bool, bool) bool {
 	return true
 }

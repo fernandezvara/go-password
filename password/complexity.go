@@ -9,7 +9,7 @@ package password
 // exact ensures password has the required amount of characters,
 // if true numType need to match
 // if false it will check the type is used, but not the amount
-func (g *Generator) Meet(source string, minLenght, maxLenght, numLower, numUpper, numDigits, numSymbols int, allowRepeat, exact bool) bool {
+func (g *Generator) Meet(source string, minLenght, maxLenght int, hasLower, hasUpper, hasDigits, hasSymbols, allowRepeat bool) bool {
 
 	var (
 		sourceBytes []byte
@@ -55,32 +55,23 @@ func (g *Generator) Meet(source string, minLenght, maxLenght, numLower, numUpper
 
 	}
 
-	if exact {
-		if numDigits != digits {
-			return false
-		}
-		if numSymbols != symbols {
-			return false
-		}
-	} else {
-		// it must have at least 1 digit
-		if numDigits > 0 && digits == 0 {
-			return false
-		}
-
-		// it must have at least 1 symbol
-		if numSymbols > 0 && symbols == 0 {
-			return false
-		}
-
+	// it must have at least 1 digit
+	if hasDigits && digits == 0 {
+		return false
 	}
+
+	// it must have at least 1 symbol
+	if hasSymbols && symbols == 0 {
+		return false
+	}
+
 	// it must have at least 1 lowercase character
-	if numLower > 0 && numLower > lower {
+	if hasLower && lower == 0 {
 		return false
 	}
 
 	// it must have at least 1 uppercase character
-	if numUpper > 0 && numUpper > upper {
+	if hasUpper && upper == 0 {
 		return false
 	}
 
@@ -89,7 +80,6 @@ func (g *Generator) Meet(source string, minLenght, maxLenght, numLower, numUpper
 	if !allowRepeat && repeat > 0 {
 		return false
 	}
-
 	return true
 
 }
